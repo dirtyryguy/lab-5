@@ -1,5 +1,7 @@
+# Add to PYTHONPATH
 import RPi.GPIO as gpio
 import time
+from multiprocessing import shaerd_memory
 
 gpio.setmode(gpio.BCM)
 
@@ -31,16 +33,16 @@ class Stepper:
         self.pins = pins
         for pin in self.pins:
             gpio.setup(pin, gpio.out, initial=0)
-        
+
         self.curr_angle = 0.0
         self.curr_step = 0
         self.__update()
-    
+
     def __update(self):
         """
 
         """
-        
+
         temp = seq[self.curr_step]
         for n, pin in enumerate(self.pins):
             gpio.output(pin, temp[n])
@@ -50,7 +52,7 @@ class Stepper:
         """
 
         """
-        
+
         s = self.curr_step
         if rot_dir:
             self.curr_step = s - 1 if s > 0 else 7 # why
@@ -60,7 +62,7 @@ class Stepper:
             self.curr_angle -= CONST_ANGLE_STEP
         self.__update()
 
-    
+
     def __turnsteps(self, steps, rot_dir):
         """
 
@@ -80,48 +82,5 @@ class Stepper:
         self.__turnsteps(int(diff/CONST_ANGLE_STEP), diff>0) # proud of this
 
 
-    # def zero(self):
-    #     pass
-
-
-
-
-
-
-
-
-
-"""
-pins = [18,21,22,23] # controller inputs: in1, in2, in3, in4
-for pin in pins:
-    GPIO.setup(pin, GPIO.OUT, initial=0)
-
-# Define the pin sequence for counter-clockwise motion, noting that
-# two adjacent phases must be actuated together before stepping to
-# a new phase so that the rotor is pulled in the right direction:
-ccw = [ [1,0,0,0],[1,1,0,0],[0,1,0,0],[0,1,1,0],
-        [0,0,1,0],[0,0,1,1],[0,0,0,1],[1,0,0,1] ]
-# Make a copy of the ccw sequence. This is needed since simply
-# saying cw = ccw would point both variables to the same list object:
-cw = ccw[:]  # use slicing to copy list (could also use ccw.copy() in Python 3)
-cw.reverse() # reverse the new cw sequence
-
-def delay_us(tus): # use microseconds to improve time resolution
-    endTime = time.time() + float(tus)/ float(1E6)
-    while time.time() < endTime:
+    def zero(self):
         pass
-
-# Make a full rotation of the output shaft:
-def loop(dir): # dir = rotation direction (cw or ccw)
-    for i in range(512): # full revolution (8 cycles/rotation * 64 gear ratio)
-        for halfstep in range(8): # 8 half-steps per cycle
-            for pin in range(4):    # 4 pins that need to be energized
-                GPIO.output(pins[pin], dir[halfstep][pin])
-            delay_us(1000)
-try:
-    loop(cw)
-    loop(ccw)
-except:
-    pass
-GPIO.cleanup()
-"""
