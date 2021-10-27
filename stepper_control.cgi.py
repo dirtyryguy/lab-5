@@ -1,20 +1,14 @@
 #!/usr/bin/python37all
 import cgi
-from multiprocessing import shared_memory
+import json
 
-shm = shared_memory.SharedMemory(name='stepper', create=False)
-buffer = shm.buf
+path = '/home/pi/Documents/ENME441/labs/stepper_control.txt'
 
 data = cgi.FieldStorage()
-try:
-    buffer[0] = 1 if 'zero' in data else 0
-    buffer[1:] = f'{float(data.getvalue('angle')):010.6f}'.encode('utf-8')
+data = {'zero':'zero' in data, 'angle':data.getvalue('angle')}
 
-except:
-    pass
-
-finally:
-    shm.close()
+with open(path, 'w') as f:
+    json.dump(data, f)
 
 print(
 '''
