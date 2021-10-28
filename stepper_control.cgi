@@ -1,3 +1,20 @@
+#!/usr/bin/python37all
+import cgi
+import cgitb
+import json
+cgitb.enable()
+
+path = '/home/pi/Documents/ENME441/labs/stepper_control.txt'
+
+data = cgi.FieldStorage()
+data = {'zero':'zero' in data, 'angle':data.getvalue('angle')}
+
+with open(path, 'w') as f:
+    json.dump(data, f)
+
+print('Content-type:text/html\n\n')
+print(
+'''
 <html>
 <head>
   <title>Stepper Control</title>
@@ -52,3 +69,5 @@
   </div>
 </body>
 </html>
+'''
+)
